@@ -33,6 +33,14 @@ def get_user_quota(current_user: User = Depends(get_current_user)):
         "unlimited": limit > 100,
     }
 
+@router.post("/user/youtube/connect")
+def connect_youtube(auth_code: str, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """
+    Connect YouTube account via OAuth
+    """
+    # TODO: Implement YouTube OAuth flow
+    return {"message": "YouTube account connected"}
+
 @router.get("/user/youtube/status")
 def get_youtube_status(current_user: User = Depends(get_current_user)):
     """
