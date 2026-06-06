@@ -32,6 +32,7 @@ docker-compose exec api alembic upgrade head
 ### Services Running
 - **API**: http://localhost:8000
 - **Docs**: http://localhost:8000/api/docs
+- **Frontend (Svelte)**: http://localhost:3000
 - **Database**: PostgreSQL on localhost:5432
 - **Cache**: Redis on localhost:6379
 - **Worker**: Celery background tasks
@@ -52,6 +53,41 @@ curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "test@example.com", "password": "password123"}'
 ```
+
+## Frontend (Svelte)
+
+A simple Svelte SPA has been added in the `client/` directory. It includes an example that fetches the backend `/health` endpoint.
+
+Development:
+
+```bash
+# From repository root
+cd client
+npm install
+npm run dev
+```
+
+By default the frontend expects the API at `http://localhost:8000`. You can override this with an environment variable when running locally:
+
+```bash
+# In Linux/macOS
+export VITE_API_URL=http://localhost:8000
+npm run dev
+```
+
+Docker (recommended for full-stack dev):
+
+```bash
+# From repository root
+cp .env.example .env
+# Start backend, worker, database, redis and frontend
+docker-compose up --build
+
+# Visit frontend at http://localhost:3000
+```
+
+Notes:
+- When started with docker-compose the frontend is configured to call the API service at `http://api:8000` inside the Docker network.
 
 ## Environment Variables
 
@@ -89,19 +125,20 @@ ADMIN_PASSWORD=admin-password-here
 
 ```
 viral-shorts-api/
-├── config/              # Configuration
-├── database/            # Database setup
-├── models/              # SQLAlchemy models
-├── routers/             # API endpoints
-├── schemas/             # Pydantic schemas
-├── services/            # Business logic
-├── queue/               # Celery tasks
-├── utils/               # Helper functions
-├── main.py              # FastAPI app
-├── requirements.txt     # Dependencies
-├── Dockerfile           # Docker image
-├── docker-compose.yml   # Local dev setup
-└── .env.example         # Environment template
+├── client/               # Svelte frontend (Vite)
+├── config/               # Configuration
+├── database/             # Database setup
+├── models/               # SQLAlchemy models
+├── routers/              # API endpoints
+├── schemas/              # Pydantic schemas
+├── services/             # Business logic
+├── queue/                # Celery tasks
+├── utils/                # Helper functions
+├── main.py               # FastAPI app
+├── requirements.txt      # Dependencies
+├── Dockerfile            # Docker image
+├── docker-compose.yml    # Local dev setup
+└── .env.example          # Environment template
 ```
 
 ## Key Features
@@ -151,16 +188,19 @@ docker-compose logs postgres
 ```
 
 ### Celery Worker Issues
+
 ```bash
 docker-compose logs worker
 ```
 
 ### Clear Redis Cache
+
 ```bash
 docker-compose exec redis redis-cli FLUSHALL
 ```
 
 ### Rebuild Docker Images
+
 ```bash
 docker-compose down
 docker-compose build --no-cache

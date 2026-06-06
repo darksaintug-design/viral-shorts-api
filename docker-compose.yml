@@ -67,6 +67,17 @@ services:
     env_file:
       - .env
 
+  frontend:
+    build:
+      context: ./client
+    container_name: viral_shorts_frontend
+    environment:
+      - VITE_API_URL=http://api:8000
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
   redis_data:
